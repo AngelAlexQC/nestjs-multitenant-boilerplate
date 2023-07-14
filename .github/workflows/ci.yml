@@ -40,3 +40,10 @@ jobs:
         run: pnpm run test:e2e
         env:
           CI: true
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false
+          tags: ${{ github.repository }}:latest # Replace with your image name
+
