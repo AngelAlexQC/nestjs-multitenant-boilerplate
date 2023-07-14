@@ -1,50 +1,25 @@
-###################
-# BUILD FOR LOCAL DEVELOPMENT
-###################
+FROM node:18-alpine AS base
 
-FROM node:18-alpine As development
+RUN npm i -g pnpm
 
-WORKDIR /usr/src/app
-COPY --chown=node:node package*.json ./
+FROM base AS dependencies
 
-RUN npm install && npm cache clean --force
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install
 
-COPY --chown=node:node . .
+FROM base AS build
 
-# Use the node user from the image (instead of the root user)
-USER node
+WORKDIR /app
+COPY . .
+COPY --from=dependencies /app/node_modules ./node_modules
+RUN pnpm build
+RUN pnpm prune --prod
 
-###################
-# BUILD FOR PRODUCTION
-###################
+FROM base AS deploy
 
-FROM node:18-alpine As build
+WORKDIR /app
+COPY --from=build /app/dist/ ./dist/
+COPY --from=build /app/node_modules ./node_modules
 
-WORKDIR /usr/src/app
-
-COPY --chown=node:node package*.json ./
-
-COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
-
-COPY --chown=node:node . .
-
-RUN npm run build
-
-ENV NODE_ENV production
-
-RUN npm install husky --save-dev
-
-USER node
-
-###################
-# PRODUCTION
-###################
-
-FROM node:18-alpine As production
-
-# Copy the bundled code from the build stage to the production image
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
-
-# Start the server using the production build
 CMD [ "node", "dist/main.js" ]
