@@ -17,3 +17,9 @@ pnpm install
 ```bash
 pnpm run dev
 ```
+
+Create new angular project with pnpm, scss and routing
+
+```bash
+ng new --defaults --style=scss --routing --package-manager=pnpm
+```
