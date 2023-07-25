@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "pnpm run --parallel dev",
     "preinstall": "npx only-allow pnpm",
-    "build": "pnpm run --parallel build"
+    "build": "pnpm run --parallel build",
+    "start": "pnpm --filter frontend run start"
   },
   "keywords": [],
   "author": "",
