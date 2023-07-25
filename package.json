@@ -7,7 +7,7 @@
     "dev": "pnpm run --parallel dev",
     "preinstall": "npx only-allow pnpm",
     "build": "pnpm run --parallel build",
-    "start": "pnpm --filter frontend run start"
+    "start": "pnpm --filter backend run start"
   },
   "keywords": [],
   "author": "",
