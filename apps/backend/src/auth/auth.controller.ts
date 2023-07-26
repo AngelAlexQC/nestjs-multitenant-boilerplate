@@ -33,6 +33,28 @@ class SignInDto {
   password: string;
 }
 
+class LoginResponse {
+  @ApiProperty({
+    description: 'Access token',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
+  })
+  accessToken: string;
+}
+
+class AuthProfile {
+  @ApiProperty({
+    description: 'User ID',
+    example: '5f9d88e5f6b7ea6c1f9d8d8f',
+  })
+  userId: string;
+
+  @ApiProperty({
+    description: 'email',
+    example: 'jhon@email.com',
+  })
+  email: string;
+}
+
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -42,6 +64,7 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User logged in successfully',
+    type: LoginResponse,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
@@ -57,9 +80,17 @@ export class AuthController {
   @ApiTags('auth')
   @ApiSecurity('bearer')
   @ApiOperation({ operationId: 'getProfile' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User profile',
+    type: AuthProfile,
+  })
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user;
+    return {
+      userId: req.user.sub,
+      email: req.user.email,
+    };
   }
 }

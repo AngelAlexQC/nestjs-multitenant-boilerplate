@@ -22,5 +22,6 @@ import { ApiModule } from '../api/api.module';
     ]),
     ReactiveFormsModule,
   ],
+  providers: [ApiModule],
 })
 export class AuthModule {}

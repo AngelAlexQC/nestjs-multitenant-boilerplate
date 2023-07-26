@@ -10,6 +10,8 @@ import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 import { RequestBuilder } from '../request-builder';
 
+import { AuthProfile } from '../models/auth-profile';
+import { LoginResponse } from '../models/login-response';
 import { SignInDto } from '../models/sign-in-dto';
 
 @Injectable({ providedIn: 'root' })
@@ -32,18 +34,18 @@ export class AuthService extends BaseService {
       body: SignInDto
     },
     context?: HttpContext
-  ): Observable<StrictHttpResponse<void>> {
+  ): Observable<StrictHttpResponse<LoginResponse>> {
     const rb = new RequestBuilder(this.rootUrl, AuthService.SignInPath, 'post');
     if (params) {
       rb.body(params.body, 'application/json');
     }
 
     return this.http.request(
-      rb.build({ responseType: 'text', accept: '*/*', context })
+      rb.build({ responseType: 'json', accept: 'application/json', context })
     ).pipe(
       filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
       map((r: HttpResponse<any>) => {
-        return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+        return r as StrictHttpResponse<LoginResponse>;
       })
     );
   }
@@ -59,9 +61,9 @@ export class AuthService extends BaseService {
       body: SignInDto
     },
     context?: HttpContext
-  ): Observable<void> {
+  ): Observable<LoginResponse> {
     return this.signIn$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
+      map((r: StrictHttpResponse<LoginResponse>): LoginResponse => r.body)
     );
   }
 
@@ -78,17 +80,17 @@ export class AuthService extends BaseService {
     params?: {
     },
     context?: HttpContext
-  ): Observable<StrictHttpResponse<void>> {
+  ): Observable<StrictHttpResponse<AuthProfile>> {
     const rb = new RequestBuilder(this.rootUrl, AuthService.GetProfilePath, 'get');
     if (params) {
     }
 
     return this.http.request(
-      rb.build({ responseType: 'text', accept: '*/*', context })
+      rb.build({ responseType: 'json', accept: 'application/json', context })
     ).pipe(
       filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
       map((r: HttpResponse<any>) => {
-        return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+        return r as StrictHttpResponse<AuthProfile>;
       })
     );
   }
@@ -103,9 +105,9 @@ export class AuthService extends BaseService {
     params?: {
     },
     context?: HttpContext
-  ): Observable<void> {
+  ): Observable<AuthProfile> {
     return this.getProfile$Response(params, context).pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
+      map((r: StrictHttpResponse<AuthProfile>): AuthProfile => r.body)
     );
   }
 

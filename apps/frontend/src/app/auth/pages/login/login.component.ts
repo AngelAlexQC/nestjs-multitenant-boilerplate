@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../../api/services';
+import { AuthService as AuthAPIService } from '../../../api/services';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { catchError } from 'rxjs';
+import { NotificationsService } from '../../../shared/notifications.service';
+import { AuthService } from '@app/auth/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +13,21 @@ import { catchError } from 'rxjs';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  constructor(private authService: AuthService, private router: Router) {}
+  redirectUrl: string | null = null;
+  constructor(
+    private authAPIService: AuthAPIService,
+    private authService: AuthService,
+    private router: Router,
+    private notifications: NotificationsService
+  ) {
+    const { redirectUrl } =
+      this.router.getCurrentNavigation()?.extras?.state || {};
+    this.redirectUrl = redirectUrl;
+    authAPIService.getProfile().subscribe((profile) => {
+      this.notifications.success('Already logged in');
+      this.router.navigate(['/home']);
+    });
+  }
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -50,7 +66,7 @@ export class LoginComponent {
   onSubmit(): void {
     const { email, password } = this.loginForm.value || {};
     if (!email || !password) return;
-    this.authService
+    this.authAPIService
       .signIn({
         body: {
           email,
@@ -61,32 +77,20 @@ export class LoginComponent {
         catchError((err) => {
           const { status } = err || {};
           if (status === 401) {
-            Swal.fire({
-              title: 'Error!',
-              text: 'Invalid email or password',
-              icon: 'error',
-              confirmButtonText: 'Ok',
-            });
+            this.notifications.error('Invalid credentials');
           } else {
-            Swal.fire({
-              title: `Error! (${status})`,
-              text: 'Something went wrong',
-              icon: 'error',
-              confirmButtonText: 'Ok',
-            });
+            const message = `An error occurred while logging in: ${err.message}, please try again`;
+            this.notifications.error(message);
           }
-          return err;
+          throw err;
         })
       )
-      .subscribe(() => {
-        Swal.fire({
-          title: 'Success!',
-          text: 'You have successfully logged in',
-          icon: 'success',
-          confirmButtonText: 'Ok',
-        }).then(() => {
-          this.router.navigate(['/']);
-        });
+      .subscribe((res) => {
+        const { accessToken } = res || {};
+        if (!accessToken) return;
+        localStorage.setItem('accessToken', accessToken);
+        this.notifications.success('Logged in successfully');
+        this.router.navigate([this.redirectUrl || '/home']);
       });
   }
 }
