@@ -4,8 +4,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
+  //app.setGlobalPrefix('api');
   const config = new DocumentBuilder()
+    .addSecurity('bearer', {
+      type: 'http',
+      scheme: 'bearer',
+    })
     .setTitle('API')
     .setDescription('This is the api documentation')
     .setVersion('1.0')
