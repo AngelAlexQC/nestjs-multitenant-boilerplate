@@ -4,6 +4,7 @@ import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import * as Joi from 'joi';
+import { MongooseModule } from '@nestjs/mongoose';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,6 +25,7 @@ import * as Joi from 'joi';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'frontend', 'dist', 'frontend'),
     }),
+    MongooseModule.forRoot(process.env.DATABASE_URL),
   ],
   controllers: [],
   providers: [],
