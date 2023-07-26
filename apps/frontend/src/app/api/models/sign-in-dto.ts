@@ -3,12 +3,12 @@
 export interface SignInDto {
 
   /**
+   * Username
+   */
+  email: string;
+
+  /**
    * Password
    */
   password: string;
-
-  /**
-   * Username
-   */
-  username: string;
 }

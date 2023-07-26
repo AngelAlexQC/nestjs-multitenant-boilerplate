@@ -153,6 +153,9 @@ importers:
       rxjs:
         specifier: ~7.8.0
         version: 7.8.1
+      sweetalert2:
+        specifier: ^11.7.20
+        version: 11.7.20
       tslib:
         specifier: ^2.3.0
         version: 2.3.0
@@ -8968,6 +8971,10 @@ packages:
 
   /swagger-ui-dist@5.1.0:
     resolution: {integrity: sha512-c1KmAjuVODxw+vwkNLALQZrgdlBAuBbr2xSPfYrJgseEi7gFKcTvShysPmyuDI4kcUa1+5rFpjWvXdusKY74mg==}
+    dev: false
+
+  /sweetalert2@11.7.20:
+    resolution: {integrity: sha512-GdU1TkiLpGGC0mcPV8bKmS7G0MR7caxambPkEU8zyepRSNR9EaEvIjNhX5QNkL0VFVzHbI3l12NtuEklkJ0D4Q==}
     dev: false
 
   /symbol-observable@4.0.0:
