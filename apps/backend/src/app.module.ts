@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,6 +27,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       rootPath: join(__dirname, '..', '..', 'frontend', 'dist', 'frontend'),
     }),
     MongooseModule.forRoot(process.env.DATABASE_URL),
+    UsersModule,
   ],
   controllers: [],
   providers: [],
