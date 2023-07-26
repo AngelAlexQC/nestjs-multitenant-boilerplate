@@ -14,6 +14,7 @@ import { Public } from './auth.decorators';
 import {
   ApiOperation,
   ApiProperty,
+  ApiResponse,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
@@ -38,6 +39,14 @@ export class AuthController {
 
   @ApiTags('auth')
   @ApiOperation({ operationId: 'signIn' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User logged in successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Invalid credentials',
+  })
   @HttpCode(HttpStatus.OK)
   @Public()
   @Post('login')

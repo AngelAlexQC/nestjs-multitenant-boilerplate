@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../api/services';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { catchError } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -56,25 +57,36 @@ export class LoginComponent {
           password,
         },
       })
-      .subscribe(
-        (response) => {
-          Swal.fire({
-            title: 'Success!',
-            text: 'You have successfully logged in',
-            icon: 'success',
-            confirmButtonText: 'Ok',
-          }).then(() => {
-            this.router.navigate(['/']);
-          });
-        },
-        (error) => {
-          Swal.fire({
-            title: 'Error!',
-            text: error.message,
-            icon: 'error',
-            confirmButtonText: 'Ok',
-          });
-        }
-      );
+      .pipe(
+        catchError((err) => {
+          const { status } = err || {};
+          if (status === 401) {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Invalid email or password',
+              icon: 'error',
+              confirmButtonText: 'Ok',
+            });
+          } else {
+            Swal.fire({
+              title: `Error! (${status})`,
+              text: 'Something went wrong',
+              icon: 'error',
+              confirmButtonText: 'Ok',
+            });
+          }
+          return err;
+        })
+      )
+      .subscribe(() => {
+        Swal.fire({
+          title: 'Success!',
+          text: 'You have successfully logged in',
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        }).then(() => {
+          this.router.navigate(['/']);
+        });
+      });
   }
 }
