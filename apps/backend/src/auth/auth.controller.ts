@@ -11,7 +11,12 @@ import {
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { Public } from './auth.decorators';
-import { ApiProperty, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiProperty,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 
 class SignInDto {
   @ApiProperty({
@@ -32,6 +37,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @ApiTags('auth')
+  @ApiOperation({ operationId: 'signIn' })
   @HttpCode(HttpStatus.OK)
   @Public()
   @Post('login')
@@ -41,6 +47,7 @@ export class AuthController {
 
   @ApiTags('auth')
   @ApiSecurity('bearer')
+  @ApiOperation({ operationId: 'getProfile' })
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
