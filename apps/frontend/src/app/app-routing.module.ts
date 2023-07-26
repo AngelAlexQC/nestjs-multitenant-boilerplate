@@ -10,18 +10,6 @@ const routes: Routes = [
       title: 'Home',
     },
   },
-  {
-    path: 'home',
-    loadChildren: () => import('./home/home.module').then((m) => m.HomeModule),
-    data: {
-      title: 'Home',
-    },
-  },
-
-  {
-    path: 'auth',
-    loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
-  },
 ];
 
 @NgModule({
