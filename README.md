@@ -1,4 +1,4 @@
-# Full Stack Monorepo Starter Kit
+# Full Stack Monorepo Starter Kit.
 
 ## Description
 
