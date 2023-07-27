@@ -9,6 +9,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GraphQLModule } from '@nestjs/graphql';
 import { UsersModule } from './users/users.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -22,10 +23,20 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
           .valid('development', 'production', 'test')
           .default('development'),
         DATABASE_URL: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
       }),
       validationOptions: {
         abortEarly: true,
       },
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('DATABASE_URL'),
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       playground: false,
@@ -38,19 +49,10 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
         'graphql-ws': true,
       },
     }),
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        uri: configService.get<string>('DATABASE_URL'),
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }),
-    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'frontend', 'dist', 'frontend'),
     }),
-
+    CommonModule,
     UsersModule,
   ],
   controllers: [],

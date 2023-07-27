@@ -17,15 +17,22 @@ type User {
   email: String!
 }
 
+type LoggedUserOutput {
+  """Generated accessToken of the user"""
+  accessToken: String!
+}
+
 type Query {
-  users: [User!]!
+  users(skip: Float, take: Float): [User!]!
   user(id: ID!): User!
+  usersCount: Float!
 }
 
 type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: ID!): User!
+  loginUser(loginUserInput: LoginUserInput!): LoggedUserOutput!
 }
 
 input CreateUserInput {
@@ -55,6 +62,14 @@ input UpdateUserInput {
   """Password of the user"""
   password: String
   id: ID!
+}
+
+input LoginUserInput {
+  """Email of the user"""
+  email: String!
+
+  """Password of the user"""
+  password: String!
 }
 
 type Subscription {
