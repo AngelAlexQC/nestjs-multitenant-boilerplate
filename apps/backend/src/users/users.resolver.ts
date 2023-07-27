@@ -5,6 +5,7 @@ import {
   Args,
   ID,
   Subscription,
+  Context,
 } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
@@ -14,6 +15,9 @@ import { PubSub } from 'graphql-subscriptions';
 import { GraphQLError } from 'graphql';
 import { LoggedUserOutput } from './dto/logged-user.output';
 import { LoginUserInput } from './dto/login-user.input';
+import { Res, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../common/auth/jwt-auth.guard';
+import { Request, Response } from 'express';
 
 const pubSub = new PubSub();
 
@@ -37,6 +41,7 @@ export class UsersResolver {
   }
 
   @Query(() => [User], { name: 'users' })
+  @UseGuards(JwtAuthGuard)
   async findAll(
     @Args('skip', { type: () => Number, nullable: true })
     skip?: number,
@@ -52,6 +57,7 @@ export class UsersResolver {
   }
 
   @Query(() => Number, { name: 'usersCount' })
+  @UseGuards(JwtAuthGuard)
   getCount() {
     return this.usersService.getCount();
   }
@@ -72,7 +78,15 @@ export class UsersResolver {
   }
 
   @Mutation(() => LoggedUserOutput)
-  loginUser(@Args('loginUserInput') loginUserInput: LoginUserInput) {
-    return this.usersService.loginUser(loginUserInput);
+  async loginUser(
+    @Args('loginUserInput') loginUserInput: LoginUserInput,
+    @Context('req') req: Request,
+  ) {
+    const { accessToken } = await this.usersService.loginUser(loginUserInput);
+    req.res?.cookie('token', accessToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * 365,
+    });
+    return { accessToken };
   }
 }

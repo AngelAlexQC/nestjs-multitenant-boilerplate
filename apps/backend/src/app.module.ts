@@ -48,6 +48,7 @@ import { CommonModule } from './common/common.module';
       subscriptions: {
         'graphql-ws': true,
       },
+      context: ({ req, res }) => ({ req, res }),
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'frontend', 'dist', 'frontend'),
