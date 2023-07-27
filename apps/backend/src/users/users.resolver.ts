@@ -52,6 +52,7 @@ export class UsersResolver {
   }
 
   @Query(() => User, { name: 'user' })
+  @UseGuards(JwtAuthGuard)
   findOne(@Args('id', { type: () => ID }) id: string) {
     return this.usersService.findOne(id);
   }
@@ -63,16 +64,19 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
+  @UseGuards(JwtAuthGuard)
   updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
     return this.usersService.update(updateUserInput.id, updateUserInput);
   }
 
   @Mutation(() => User)
+  @UseGuards(JwtAuthGuard)
   removeUser(@Args('id', { type: () => ID }) id: string) {
     return this.usersService.remove(id);
   }
 
   @Subscription(() => User)
+  @UseGuards(JwtAuthGuard)
   userAdded() {
     return pubSub.asyncIterator('userAdded');
   }
@@ -88,5 +92,12 @@ export class UsersResolver {
       maxAge: 1000 * 60 * 60 * 24 * 365,
     });
     return { accessToken };
+  }
+
+  @Query(() => User)
+  @UseGuards(JwtAuthGuard)
+  async getLoggedUser(@Context('req') req: Request) {
+    const { userId } = req.user as { userId: string };
+    return this.usersService.findOne(userId);
   }
 }

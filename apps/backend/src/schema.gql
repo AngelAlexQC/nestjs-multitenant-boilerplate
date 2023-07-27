@@ -26,6 +26,7 @@ type Query {
   users(skip: Float, take: Float): [User!]!
   user(id: ID!): User!
   usersCount: Float!
+  getLoggedUser: User!
 }
 
 type Mutation {
