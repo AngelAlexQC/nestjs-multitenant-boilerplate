@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
+import { User, UserSchema } from './entities/user.entity';
+import { MongooseModule } from '@nestjs/mongoose';
+
 @Module({
-  providers: [UsersResolver, UsersService, UsersRepository],
   imports: [
     MongooseModule.forFeatureAsync([
       {
@@ -17,6 +17,6 @@ import { UsersRepository } from './users.repository';
       },
     ]),
   ],
-  exports: [UsersService],
+  providers: [UsersResolver, UsersService, UsersRepository],
 })
 export class UsersModule {}

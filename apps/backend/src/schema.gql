@@ -1,0 +1,62 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""The User model"""
+type User {
+  """The id of the user"""
+  id: ID!
+
+  """The first name of the user"""
+  firstName: String!
+
+  """The last name of the user"""
+  lastName: String!
+
+  """The email of the user"""
+  email: String!
+}
+
+type Query {
+  users: [User!]!
+  user(id: Int!): User!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+}
+
+input CreateUserInput {
+  """First name of the user"""
+  firstName: String!
+
+  """Last name of the user"""
+  lastName: String!
+
+  """Email of the user"""
+  email: String!
+
+  """Password of the user"""
+  password: String!
+}
+
+input UpdateUserInput {
+  """First name of the user"""
+  firstName: String
+
+  """Last name of the user"""
+  lastName: String
+
+  """Email of the user"""
+  email: String
+
+  """Password of the user"""
+  password: String
+  id: ID!
+}
+
+type Subscription {
+  userAdded: User!
+}

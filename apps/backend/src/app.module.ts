@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { GraphQLModule } from '@nestjs/graphql';
 import { UsersModule } from './users/users.module';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -23,10 +27,30 @@ import { UsersModule } from './users/users.module';
         abortEarly: true,
       },
     }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      installSubscriptionHandlers: true,
+      introspection: true,
+      autoSchemaFile: 'src/schema.gql',
+      driver: ApolloDriver,
+      subscriptions: {
+        'graphql-ws': true,
+      },
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('DATABASE_URL'),
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }),
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', 'frontend', 'dist', 'frontend'),
     }),
-    MongooseModule.forRoot(process.env.DATABASE_URL),
+
     UsersModule,
   ],
   controllers: [],
