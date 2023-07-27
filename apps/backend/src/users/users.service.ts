@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import * as bcrypt from 'bcrypt';
@@ -11,17 +7,52 @@ import { User, UserDocument } from './entities/user.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { AuthService } from '../common/auth/auth.service';
 import { LoginUserInput } from './dto/login-user.input';
-import { Repository } from './Repository';
 
 const saltRounds = 10;
 
+class GetUsersArgs {
+  skip?: number;
+  take?: number;
+}
+
 @Injectable()
-export class UsersService extends Repository<UserDocument> {
+export class UsersService {
   constructor(
-    @InjectModel(User.name) private entity: Model<UserDocument>,
-    private authService: AuthService,
-  ) {
-    super(entity);
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly authService: AuthService,
+  ) {}
+
+  async create(createUserInput: CreateUserInput): Promise<User> {
+    createUserInput.password = bcrypt.hashSync(
+      createUserInput.password,
+      saltRounds,
+    );
+    const newUser = new this.userModel(createUserInput);
+    return newUser.save();
+  }
+
+  async findAll({ skip = 0, take = 25 }: GetUsersArgs): Promise<User[]> {
+    return await this.userModel.find().skip(skip).limit(take).exec();
+  }
+
+  findOne(id: string): Promise<User> {
+    return this.userModel.findById(id).exec();
+  }
+
+  findOneByEmail(email: string): Promise<User> {
+    return this.userModel.findOne({ email }).exec();
+  }
+
+  update(id: string, updateUserInput: UpdateUserInput): Promise<User> {
+    return this.userModel.findByIdAndUpdate(id, updateUserInput).exec();
+  }
+
+  remove(id: string): Promise<User> {
+    return this.userModel.findByIdAndDelete(id).exec();
+  }
+
+  async getCount(): Promise<number> {
+    return this.userModel.countDocuments().exec();
   }
 
   async loginUser(loginUserInput: LoginUserInput) {
@@ -35,13 +66,4 @@ export class UsersService extends Repository<UserDocument> {
       return this.authService.generateUserCredentials(user);
     }
   }
-
-  async findOneByEmail(email: string): Promise<UserDocument> {
-    return this.entity.findOne({ email });
-  }
-}
-
-export class FindAllArgs {
-  skip?: number;
-  take?: number;
 }

@@ -48,9 +48,7 @@ export class UsersResolver {
 
   @Query(() => User, { name: 'user' })
   findOne(@Args('id', { type: () => ID }) id: string) {
-    return this.usersService.find({
-      _id: id,
-    });
+    return this.usersService.findOne(id);
   }
 
   @Query(() => Number, { name: 'usersCount' })
@@ -60,19 +58,12 @@ export class UsersResolver {
 
   @Mutation(() => User)
   updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
-    return this.usersService.updateOne(
-      {
-        _id: updateUserInput.id,
-      },
-      updateUserInput,
-    );
+    return this.usersService.update(updateUserInput.id, updateUserInput);
   }
 
   @Mutation(() => User)
   removeUser(@Args('id', { type: () => ID }) id: string) {
-    return this.usersService.remove({
-      _id: id,
-    });
+    return this.usersService.remove(id);
   }
 
   @Subscription(() => User)
