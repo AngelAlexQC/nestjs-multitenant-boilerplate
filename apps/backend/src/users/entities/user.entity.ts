@@ -1,5 +1,5 @@
-import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
-import { Prop, SchemaFactory } from '@nestjs/mongoose';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { Prop, SchemaFactory, Schema } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
@@ -7,15 +7,14 @@ export type UserDocument = HydratedDocument<User>;
 @ObjectType({
   description: 'The User model',
 })
+@Schema({
+  timestamps: true,
+})
 export class User {
   @Field(() => ID, {
     description: 'The id of the user',
   })
-  @Prop({
-    type: Types.ObjectId,
-    auto: true,
-  })
-  id: string;
+  _id: Types.ObjectId;
 
   @Field(() => String, {
     description: 'The first name of the user',

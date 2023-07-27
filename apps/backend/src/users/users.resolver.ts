@@ -3,7 +3,7 @@ import {
   Query,
   Mutation,
   Args,
-  Int,
+  ID,
   Subscription,
 } from '@nestjs/graphql';
 import { UsersService } from './users.service';
@@ -11,6 +11,7 @@ import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { PubSub } from 'graphql-subscriptions';
+import { GraphQLError } from 'graphql';
 
 const pubSub = new PubSub();
 
@@ -19,8 +20,16 @@ export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Mutation(() => User)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    const user = this.usersService.create(createUserInput);
+  async createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
+    const user = await this.usersService
+      .create(createUserInput)
+      .catch((err) => {
+        if (err.code === 11000) {
+          throw new GraphQLError(
+            `Email ${createUserInput.email} already exists`,
+          );
+        }
+      });
     pubSub.publish('userAdded', { userAdded: user });
     return user;
   }
@@ -31,7 +40,7 @@ export class UsersResolver {
   }
 
   @Query(() => User, { name: 'user' })
-  findOne(@Args('id', { type: () => Int }) id: string) {
+  findOne(@Args('id', { type: () => ID }) id: string) {
     return this.usersService.findOne(id);
   }
 
@@ -41,7 +50,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  removeUser(@Args('id', { type: () => Int }) id: string) {
+  removeUser(@Args('id', { type: () => ID }) id: string) {
     return this.usersService.remove(id);
   }
 

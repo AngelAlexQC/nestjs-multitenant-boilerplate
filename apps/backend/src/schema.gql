@@ -5,7 +5,7 @@
 """The User model"""
 type User {
   """The id of the user"""
-  id: ID!
+  _id: ID!
 
   """The first name of the user"""
   firstName: String!
@@ -19,13 +19,13 @@ type User {
 
 type Query {
   users: [User!]!
-  user(id: Int!): User!
+  user(id: ID!): User!
 }
 
 type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User!
+  removeUser(id: ID!): User!
 }
 
 input CreateUserInput {
