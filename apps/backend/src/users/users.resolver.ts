@@ -15,9 +15,9 @@ import { PubSub } from 'graphql-subscriptions';
 import { GraphQLError } from 'graphql';
 import { LoggedUserOutput } from './dto/logged-user.output';
 import { LoginUserInput } from './dto/login-user.input';
-import { Res, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../common/auth/jwt-auth.guard';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 
 const pubSub = new PubSub();
 
